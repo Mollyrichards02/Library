@@ -1,8 +1,10 @@
-
-
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.sql.ResultSet;
 
 public class Book {
 
@@ -112,14 +114,82 @@ public class Book {
 
         Book newbook = new Book(ranval, bookTitle, bookAuthor, yearPub, onLoan, onLoanTo);
         bookList.add(newbook);
+
+        insertBookIntoDatabase(newbook);
+
+        fetchAndPrintAllBooks();
+
         System.out.println();
         System.out.println("Book added: " + newbook);
         System.out.println();
         System.out.println("--------------");
 
     }
+    private static void insertBookIntoDatabase(Book book) {
+        try {
+            // Get a connection from the DatabaseConnection class
+            Connection connection = DatabaseConnection.getConnection();
 
-    public static void viewAllBooks() {
+            // Create the SQL insert statement
+            String insertSQL = "INSERT INTO Book (bookID, title, author, yearPublished, onLoan, onLoanTo) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.setInt(1, book.getBookID());
+            preparedStatement.setString(2, book.getTitle());
+            preparedStatement.setString(3, book.getAuthor());
+            preparedStatement.setInt(4, book.getYearPublished());
+            preparedStatement.setBoolean(5, book.isOnLoan());
+            preparedStatement.setString(6, book.getOnLoanTo());
+
+            // Execute the insert
+            preparedStatement.executeUpdate();
+
+            // Close the connections
+            preparedStatement.close();
+            connection.close();
+
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void fetchAndPrintAllBooks() {
+        try {
+            // Get a connection from the DatabaseConnection class
+            Connection connection = DatabaseConnection.getConnection();
+
+            // Create the SQL select statement
+            String query = "SELECT * FROM Book";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Process the results
+            while (resultSet.next()) {
+                int bookID = resultSet.getInt("bookID");
+                String title = resultSet.getString("title");
+                String author = resultSet.getString("author");
+                int yearPublished = resultSet.getInt("yearPublished");
+                boolean onLoan = resultSet.getBoolean("onLoan");
+                String onLoanTo = resultSet.getString("onLoanTo");
+
+                System.out.println("BookID: " + bookID);
+                System.out.println("Title: " + title);
+                System.out.println("Author: " + author);
+                System.out.println("Year Published: " + yearPublished);
+                System.out.println("On Loan: " + onLoan);
+                System.out.println("On Loan To: " + onLoanTo);
+                System.out.println("---------------------------");
+            }
+
+            // Close the connections
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+
+        } catch (ClassNotFoundException | SQLException e) {
+        }
+    }
+
+        public static void viewAllBooks() {
         int bookCount = Book.bookList.size();
         System.out.println();
 
