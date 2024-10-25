@@ -57,7 +57,7 @@ public class LibraryManagementSystem {
                 case 4:
                     Librarian.createLibrarian();
                 case 5:
-                    Book.viewAllBooks();
+                    Book.fetchAndPrintAllBooks();
                     break;
                 case 6:
                     Member.viewAllMembers();

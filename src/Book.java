@@ -18,7 +18,8 @@ public class Book {
     private String onLoanTo;
 
     static ArrayList<Book> bookList = new ArrayList<>();
-    public Book(int bookID, String title, String author, int yearPublished, boolean onLoan, String onLoanTo){
+
+    public Book(int bookID, String title, String author, int yearPublished, boolean onLoan, String onLoanTo) {
         this.title = title;
         this.author = author;
         this.yearPublished = yearPublished;
@@ -28,29 +29,34 @@ public class Book {
     }
 
 
-    public String getTitle(){
+    public String getTitle() {
         return title;
     }
-    public void setTitle(String title){
-        this.title=title;
+
+    public void setTitle(String title) {
+        this.title = title;
     }
-    public String getAuthor(){
+
+    public String getAuthor() {
         return author;
     }
 
-    public void setAuthor(String author){
-        this.author=author;
+    public void setAuthor(String author) {
+        this.author = author;
     }
-    public int getYearPublished(){
+
+    public int getYearPublished() {
         return yearPublished;
     }
-    public void setYearPublished(int yearPublished){
+
+    public void setYearPublished(int yearPublished) {
         this.yearPublished = yearPublished;
     }
 
     public int getBookID() {
         return bookID;
     }
+
     public void setBookID(int bookID) {
         this.bookID = bookID;
     }
@@ -80,7 +86,7 @@ public class Book {
         Random newbookID = new Random();
         int newID;
 
-        while(true) {
+        while (true) {
             newID = newbookID.nextInt(101);
             boolean exists = false;
 
@@ -110,10 +116,11 @@ public class Book {
 
         int ranval = generateRandomBookID();
         boolean onLoan = false;
-        String onLoanTo = "N/A";
+
+        String onLoanTo = null;
 
         Book newbook = new Book(ranval, bookTitle, bookAuthor, yearPub, onLoan, onLoanTo);
-        bookList.add(newbook);
+
 
         insertBookIntoDatabase(newbook);
 
@@ -125,6 +132,7 @@ public class Book {
         System.out.println("--------------");
 
     }
+
     private static void insertBookIntoDatabase(Book book) {
         try {
             // Get a connection from the DatabaseConnection class
@@ -152,7 +160,7 @@ public class Book {
         }
     }
 
-    private static void fetchAndPrintAllBooks() {
+    public static void fetchAndPrintAllBooks() {
         try {
             // Get a connection from the DatabaseConnection class
             Connection connection = DatabaseConnection.getConnection();
@@ -163,48 +171,36 @@ public class Book {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             // Process the results
-            while (resultSet.next()) {
-                int bookID = resultSet.getInt("bookID");
-                String title = resultSet.getString("title");
-                String author = resultSet.getString("author");
-                int yearPublished = resultSet.getInt("yearPublished");
-                boolean onLoan = resultSet.getBoolean("onLoan");
-                String onLoanTo = resultSet.getString("onLoanTo");
+            if (!resultSet.isBeforeFirst()) {
+                System.out.println("Error: There are no books in the library!");
+                System.out.println();
+            } else {
+                // Process the results
+                while (resultSet.next()) {
+                    int bookID = resultSet.getInt("bookID");
+                    String title = resultSet.getString("title");
+                    String author = resultSet.getString("author");
+                    int yearPublished = resultSet.getInt("yearPublished");
+                    boolean onLoan = resultSet.getBoolean("onLoan");
+                    String onLoanTo = resultSet.getString("onLoanTo");
 
-                System.out.println("BookID: " + bookID);
-                System.out.println("Title: " + title);
-                System.out.println("Author: " + author);
-                System.out.println("Year Published: " + yearPublished);
-                System.out.println("On Loan: " + onLoan);
-                System.out.println("On Loan To: " + onLoanTo);
-                System.out.println("---------------------------");
+                    System.out.println("BookID: " + bookID);
+                    System.out.println("Title: " + title);
+                    System.out.println("Author: " + author);
+                    System.out.println("Year Published: " + yearPublished);
+                    System.out.println("On Loan: " + onLoan);
+                    System.out.println("On Loan To: " + onLoanTo);
+                    System.out.println("---------------------------");
+                }
             }
 
-            // Close the connections
+                    // Close the connections
             resultSet.close();
             preparedStatement.close();
             connection.close();
 
         } catch (ClassNotFoundException | SQLException e) {
         }
-    }
 
-        public static void viewAllBooks() {
-        int bookCount = Book.bookList.size();
-        System.out.println();
-
-        if (bookCount == 0) {
-            System.out.println("Error: There are no books in the library!");
-            System.out.println();
-        }else{
-            System.out.println("-----------");
-            System.out.println();
-            System.out.println("Books: ");
-            for (Book book : bookList) {
-                System.out.println(book);
-            }
-            System.out.println();
-
-            }
     }
 }
