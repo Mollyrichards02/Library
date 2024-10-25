@@ -1,0 +1,20 @@
+
+Book Table:
+
+CREATE TABLE Book (
+         bookID INT PRIMARY KEY,
+         title VARCHAR(255) NOT NULL,
+         author VARCHAR(255) NOT NULL,
+         yearPublished INT NOT NULL,
+         onLoan BOOLEAN NOT NULL,
+         onLoanTo VARCHAR(255)
+     );
+
+
+Members Table:
+
+CREATE TABLE Member (
+    membershipID INT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    membershipType VARCHAR(255) NOT NULL
+);
