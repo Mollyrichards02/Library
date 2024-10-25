@@ -60,7 +60,7 @@ public class LibraryManagementSystem {
                     Book.fetchAndPrintAllBooks();
                     break;
                 case 6:
-                    Member.viewAllMembers();
+                    Member.fetchAndPrintAllMembers();
                     break;
                 case 7:
                     Loan.viewAllLoans();

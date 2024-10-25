@@ -5,17 +5,22 @@ import java.util.*;
 public class Loan {
     private int loanID;
     private String bookTitle;
+    private int memberID;
     private static String memberName;
+
     private Date dueDate;
     private int BookID;
+
+
 
     static ArrayList<Loan> loanList = new ArrayList<>();
 
     // Constructor
-    public Loan(int loanID, int bookID, String bookTitle, String memberName) {
+    public Loan(int loanID, int bookID, String bookTitle, int memberID, String memberName) {
         this.loanID = loanID;
         this.BookID = bookID;
         this.bookTitle = bookTitle;
+        this.memberID = memberID;
         this.memberName = memberName;
         this.dueDate = calculateDueDate();
     }
@@ -77,11 +82,19 @@ public class Loan {
         BookID = bookID;
     }
 
+    public int getMemberID() {
+        return memberID;
+    }
+
+    public void setMemberID(int memberID) {
+        this.memberID = memberID;
+    }
+
     @Override
     public String toString() {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        return String.format("LoanID: %d, BookID: %d, Book Title: %s, Member: %s, Due Date: %s",
-                getLoanID(), getBookID(), getBookTitle(), getMemberName(), sdf.format(getDueDate()));
+        return String.format("LoanID: %d, BookID: %d, Book Title: %s, MemberID: %d, Member: %s, Due Date: %s",
+                getLoanID(), getBookID(), getBookTitle(), getMemberID(), getMemberName(), sdf.format(getDueDate()));
     }
 
     private Date calculateDueDate() {
@@ -217,10 +230,12 @@ public class Loan {
 
               Member selectedMember = selectMember(scanner);
               String memName = null;
+              int memID = 0;
 
               if (selectedMember != null) {
                   System.out.println("You selected: " + selectedMember);
                   memName = selectedMember.getName();
+                  memID = selectedMember.getMembershipID();
               } else {
                   System.out.println("Invalid Member ID. Please try again.");
                   System.out.println();
@@ -228,8 +243,10 @@ public class Loan {
               }
 
 
-              Loan newLoan = new Loan(ranval, bookID, bookName, memName);
+              Loan newLoan = new Loan(ranval, bookID, bookName, memID, memName);
               loanList.add(newLoan);
+
+
               for (Book book: Book.bookList) {
                   if (book.getBookID() == bookID) {
                       book.setOnLoan(true);

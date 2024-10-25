@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class Member {
     private String name;
@@ -100,6 +104,28 @@ public class Member {
         return memType;
     }
 
+    private static void insertMemberIntoDatabase(Member member) {
+        try {
+            // Get a connection from the DatabaseConnection class
+            Connection connection = DatabaseConnection.getConnection();
+
+            // Create the SQL insert statement
+            String insertSQL = "INSERT INTO Member (membershipID, name, membershipType) VALUES (?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.setInt(1, member.getMembershipID());
+            preparedStatement.setString(2, member.getName());
+            preparedStatement.setString(3, member.getMembershipType());
+
+            // Execute the insert
+            preparedStatement.executeUpdate();
+
+            // Close the connections
+            preparedStatement.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void createMember() {
         Scanner scanner = new Scanner(System.in);
@@ -116,29 +142,53 @@ public class Member {
         System.out.println("You selected: " + memType);
 
         Member newMember = new Member(memName, ranval, memType);
-        memberList.add(newMember);
+
+        insertMemberIntoDatabase(newMember);
+
+
         System.out.println();
         System.out.println("New Member added: " + newMember);
         System.out.println();
         System.out.println("--------------");
 
     }
-        public static void viewAllMembers() {
-            int memberCount = Member.memberList.size();
-            System.out.println();
-            if (memberCount == 0) {
-                System.out.println("Error: There are no members registered!");
+
+    public static void fetchAndPrintAllMembers() {
+        try {
+            // Get a connection from the DatabaseConnection class
+            Connection connection = DatabaseConnection.getConnection();
+
+            // Create the SQL select statement
+            String query = "SELECT * FROM Member";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            // Check if the result set is empty
+            if (!resultSet.isBeforeFirst()) {
+                System.out.println("Error: There are no members in the database!");
                 System.out.println();
-            }else{
-                    System.out.println();
-                    System.out.println("Members: ");
-                    for (Member member : memberList) {
-                        System.out.println(member);
-                    }
-                    System.out.println();
+            } else {
+                // Process the results
+                while (resultSet.next()) {
+                    int membershipID = resultSet.getInt("membershipID");
+                    String name = resultSet.getString("name");
+                    String membershipType = resultSet.getString("membershipType");
+
+                    System.out.println("MembershipID: " + membershipID);
+                    System.out.println("Name: " + name);
+                    System.out.println("Membership Type: " + membershipType);
+                    System.out.println("---------------------------");
                 }
+            }
 
+            // Close the connections
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
 
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+            }
         }
     }
 
