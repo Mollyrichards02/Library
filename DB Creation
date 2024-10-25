@@ -18,3 +18,14 @@ CREATE TABLE Member (
     name VARCHAR(255) NOT NULL,
     membershipType VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE Loan (
+    loanID INT PRIMARY KEY,
+    bookTitle VARCHAR(255) NOT NULL,
+    membershipID INT NOT NULL,
+    memberName VARCHAR(255) NOT NULL,
+    dueDate DATE NOT NULL,
+    BookID INT NOT NULL,
+    FOREIGN KEY (BookID) REFERENCES Book(bookID),
+    FOREIGN KEY (membershipID) REFERENCES Member(membershipID)
+);
