@@ -2,6 +2,18 @@ import java.util.Scanner;
 
 public class LibraryManagementSystem {
 
+    public static void displayMenu(){
+        System.out.println("1. Add a new book");
+        System.out.println("2. Add a new member");
+        System.out.println("3. Add a new loan");
+        System.out.println("4. Return a book");
+        System.out.println("5. View all books");
+        System.out.println("6. View all members");
+        System.out.println("7. View all loans");
+        System.out.println("8. View all librarians");
+        System.out.println("9. Exit");
+        System.out.print("Enter your choice: ");
+    }
     public static void menu() {
         Scanner scanner = new Scanner(System.in);
         String name;
@@ -28,16 +40,7 @@ public class LibraryManagementSystem {
         int choice;
 
         do {
-            System.out.println("1. Add a new book");
-            System.out.println("2. Add a new member");
-            System.out.println("3. Add a new loan");
-            System.out.println("4. Add a new librarian");
-            System.out.println("5. View all books");
-            System.out.println("6. View all members");
-            System.out.println("7. View all loans");
-            System.out.println("8. View all librarians");
-            System.out.println("9. Exit");
-            System.out.print("Enter your choice: ");
+            displayMenu();
             choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
 

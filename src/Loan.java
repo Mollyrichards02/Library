@@ -246,9 +246,7 @@ public class Loan {
           } catch (Exception e) {
               System.out.println("An unexpected error occurred: " + e.getMessage());
           }
-
         }
-
 
     }
 }
