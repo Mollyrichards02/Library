@@ -90,18 +90,33 @@ public class Book {
             newID = newbookID.nextInt(101);
             boolean exists = false;
 
-            for (Book book : Book.bookList) {
-                if (book.getBookID() == newID) {
-                    exists = true;
-                    break;
+            if (!exists) {
+                try {
+                    Connection connection = DatabaseConnection.getConnection();
+                    String query = "SELECT 1 FROM Book WHERE bookID = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setInt(1, newID);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+
+                    if (resultSet.next()) {
+                        exists = true;
+                    }
+
+                    resultSet.close();
+                    preparedStatement.close();
+                    connection.close();
+                } catch (ClassNotFoundException | SQLException e) {
+                    e.printStackTrace();
                 }
             }
+
             // If the ID is unique, break the loop
             if (!exists) {
                 break;
             }
         }
-        return newID;// Generates a random number between 0 and 100
+
+            return newID;// Generates a random number between 0 and 100
     }
 
     public static void createBook() {
