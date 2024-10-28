@@ -1,7 +1,7 @@
 
-Book Table:
+LibraryManagement.Book Table:
 
-CREATE TABLE Book (
+CREATE TABLE LibraryManagement.Book (
          bookID INT PRIMARY KEY,
          title VARCHAR(255) NOT NULL,
          author VARCHAR(255) NOT NULL,
@@ -13,19 +13,19 @@ CREATE TABLE Book (
 
 Members Table:
 
-CREATE TABLE Member (
+CREATE TABLE LibraryManagement.Member (
     membershipID INT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     membershipType VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE Loan (
+CREATE TABLE LibraryManagement.Loan (
     loanID INT PRIMARY KEY,
     bookTitle VARCHAR(255) NOT NULL,
     membershipID INT NOT NULL,
     memberName VARCHAR(255) NOT NULL,
     dueDate DATE NOT NULL,
     BookID INT NOT NULL,
-    FOREIGN KEY (BookID) REFERENCES Book(bookID),
-    FOREIGN KEY (membershipID) REFERENCES Member(membershipID)
+    FOREIGN KEY (BookID) REFERENCES LibraryManagement.Book(bookID),
+    FOREIGN KEY (membershipID) REFERENCES LibraryManagement.Member(membershipID)
 );

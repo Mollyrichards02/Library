@@ -1,3 +1,5 @@
+package LibraryManagement;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -11,13 +13,9 @@ public class Book {
     private String title;
     private String author;
     private int yearPublished;
-
     private int bookID;
-
     private boolean onLoan;
     private String onLoanTo;
-
-    static ArrayList<Book> bookList = new ArrayList<>();
 
     public Book(int bookID, String title, String author, int yearPublished, boolean onLoan, String onLoanTo) {
         this.title = title;
@@ -27,8 +25,6 @@ public class Book {
         this.onLoan = onLoan;
         this.onLoanTo = onLoanTo;
     }
-
-
     public String getTitle() {
         return title;
     }
@@ -150,7 +146,7 @@ public class Book {
 
     private static void insertBookIntoDatabase(Book book) {
         try {
-            // Get a connection from the DatabaseConnection class
+            // Get a connection from the LibraryManagement.DatabaseConnection class
             Connection connection = DatabaseConnection.getConnection();
 
             // Create the SQL insert statement
@@ -177,7 +173,7 @@ public class Book {
 
     public static void fetchAndPrintAllBooks() {
         try {
-            // Get a connection from the DatabaseConnection class
+            // Get a connection from the LibraryManagement.DatabaseConnection class
             Connection connection = DatabaseConnection.getConnection();
 
             // Create the SQL select statement

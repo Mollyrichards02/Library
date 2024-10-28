@@ -1,3 +1,8 @@
+package LibraryManagement;
+
+import LibraryManagement.Book;
+import LibraryManagement.Librarian;
+
 import java.util.Scanner;
 
 public class LibraryManagementSystem {
@@ -6,7 +11,7 @@ public class LibraryManagementSystem {
         System.out.println("1. Add a new book");
         System.out.println("2. Add a new member");
         System.out.println("3. Add a new loan");
-        System.out.println("4. Return a book");
+        System.out.println("4. Add new librarian");
         System.out.println("5. View all books");
         System.out.println("6. View all members");
         System.out.println("7. View all loans");
@@ -63,7 +68,7 @@ public class LibraryManagementSystem {
                     Member.fetchAndPrintAllMembers();
                     break;
                 case 7:
-                    Loan.viewAllLoans();
+                    Loan.fetchAndPrintAllLoans();
                     break;
                 case 8:
                     Librarian.viewAllLibrarians();

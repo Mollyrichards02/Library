@@ -1,13 +1,17 @@
+package LibraryManagement;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+
 
 
 public class Loan {
@@ -20,9 +24,6 @@ public class Loan {
     private int BookID;
 
 
-
-    static ArrayList<Loan> loanList = new ArrayList<>();
-
     // Constructor
     public Loan(int loanID, int bookID, String bookTitle, int memberID, String memberName) {
         this.loanID = loanID;
@@ -31,23 +32,6 @@ public class Loan {
         this.memberID = memberID;
         this.memberName = memberName;
         this.dueDate = calculateDueDate();
-    }
-
-    public static void viewAllLoans() {
-        int loanCount = Loan.loanList.size();
-        System.out.println();
-        if (loanCount == 0) {
-            System.out.println("Error: There are no active loans!");
-            System.out.println();
-        } else {
-
-            System.out.println();
-            System.out.println("Loans: ");
-            for (Loan loan : loanList) {
-                System.out.println(loan);
-            }
-            System.out.println();
-        }
     }
 
     public int getLoanID() {
@@ -111,26 +95,77 @@ public class Loan {
         return calendar.getTime();
     }
 
+    public static void fetchAndPrintAllLoans() {
+        try {
+            // Get a connection from the LibraryManagement.DatabaseConnection class
+            Connection connection = DatabaseConnection.getConnection();
+            // Create the SQL select statement
+            String query = "SELECT * FROM Loan";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            // Check if the result set is empty
+            if (!resultSet.isBeforeFirst()) {
+                System.out.println("Error: There are no loans in the database!");
+                System.out.println();
+            } else {
+                // Process the results
+                while (resultSet.next()) {
+                    int loanID = resultSet.getInt("loanID");
+                    String bookTitle = resultSet.getString("bookTitle");
+                    int membershipID = resultSet.getInt("membershipID");
+                    String memberName = resultSet.getString("memberName");
+                    Date dueDate = resultSet.getDate("dueDate");
+                    int bookID = resultSet.getInt("BookID");
+                    System.out.println("LoanID: " + loanID);
+                    System.out.println("Book Title: " + bookTitle);
+                    System.out.println("MembershipID: " + membershipID);
+                    System.out.println("Member Name: " + memberName);
+                    System.out.println("Due Date: " + dueDate);
+                    System.out.println("BookID: " + bookID);
+                    System.out.println("---------------------------");
+                }
+            }
+            // Close the connections
+            resultSet.close();
+            preparedStatement.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static int generateLoanID() {
         Random loanID = new Random();
         int newloanID;
-
         while (true) {
             newloanID = loanID.nextInt(101);
             boolean exists = false;
-
-            for (Loan loan : Loan.loanList) {
-                if (loan.getLoanID() == newloanID) {
-                    exists = true;
-                    break;
+            if (!exists) {
+                try {
+                    Connection connection = DatabaseConnection.getConnection();
+                    String query = "SELECT 1 FROM Loan WHERE loanID = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setInt(1, newloanID);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        exists = true;
+                    }
+                    resultSet.close();
+                    preparedStatement.close();
+                    connection.close();
+                } catch (ClassNotFoundException | SQLException e) {
+                    e.printStackTrace();
                 }
             }
+            // If the ID is unique, break the loop
             if (!exists) {
                 break;
             }
         }
-        return newloanID;// Generates a random number between 0 and 100
+        return newloanID; // Generates a random number between 0 and 100
     }
+
 
     public static Book getBookById(int bookID) throws Exception {
         String query = "SELECT * FROM Book WHERE bookID = " + bookID;
@@ -162,24 +197,29 @@ public class Loan {
 
     }
 
-    public static Member selectMember(Scanner scanner){
+    public static Member getMemberById(int memberID) throws Exception {
+        String query = "SELECT * FROM Member WHERE membershipID = " + memberID;
+        try (Connection con = DatabaseConnection.getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return new Member(
+                        rs.getString("name"),
+                        rs.getInt("membershipID"),
+                        rs.getString("membershipType") // Make sure this matches your table structure
+                );
+            }
+        }
+        return null; // Return null if the member is not found
+    }
+
+    public static Member selectMember(Scanner scanner) throws Exception {
         System.out.println();
         System.out.println("Please select a member by typing in the memberID:");
 
-
         int choiceTwo = scanner.nextInt();
-        String memName = null;
-        scanner.nextLine();
-
-        Member selectedMember = null;
-        for (Member member : Member.memberList) {
-            if (member.getMembershipID() == choiceTwo) {
-                selectedMember = member;
-                memName = selectedMember.getName();
-                break;
-            }
-        }
-
+        scanner.nextLine(); // Consume newline
+        Member selectedMember = getMemberById(choiceTwo);
 
         return selectedMember;
     }
@@ -204,6 +244,75 @@ public class Loan {
         }
         return books;
     }
+
+    public static List<Member> getAllMembers() throws Exception {
+        List<Member> members = new ArrayList<>();
+        String query = "SELECT * FROM Member";
+        try (Connection con = DatabaseConnection.getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                Member member = new Member(
+                        rs.getString("name"),
+                        rs.getInt("membershipID"),
+                        rs.getString("membershipType") // Correct field name
+                );
+
+                members.add(member);
+            }
+        }
+        return members;
+    }
+
+    public static void updateBook(int bookID, String memName) {
+        try {
+            Connection connection = DatabaseConnection.getConnection();
+            String query = "UPDATE Book SET onLoan = ?, onLoanTo = ? WHERE bookID = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setBoolean(1, true);
+            preparedStatement.setString(2, memName);
+            preparedStatement.setInt(3, bookID);
+            int rowsAffected = preparedStatement.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("Book with ID " + bookID + " has been updated to on loan.");
+            } else {
+                System.out.println("No book found with ID " + bookID + ".");
+            }
+            preparedStatement.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void insertLoanIntoDatabase(Loan loan) {
+        try {
+            // Get a connection from the LibraryManagement.DatabaseConnection class
+            Connection connection = DatabaseConnection.getConnection();
+            // Create the SQL insert statement
+            String insertSQL = "INSERT INTO Loan (loanID, bookTitle, membershipID, memberName, dueDate, BookID) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(insertSQL);
+            preparedStatement.setInt(1, loan.getLoanID());
+            preparedStatement.setString(2, loan.getBookTitle());
+            preparedStatement.setInt(3, loan.getMemberID());
+            preparedStatement.setString(4, loan.getMemberName());
+
+            // Convert java.util.Date to java.sql.Date
+            java.sql.Date sqlDate = new java.sql.Date(loan.getDueDate().getTime());
+            preparedStatement.setDate(5, sqlDate);
+
+            preparedStatement.setInt(6, loan.getBookID());
+            // Execute the insert
+            preparedStatement.executeUpdate();
+            // Close the connections
+            preparedStatement.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 
     public static void createLoan() throws Exception {
         Scanner scanner = new Scanner(System.in);
@@ -263,14 +372,13 @@ public class Loan {
 
               System.out.println();
               System.out.println("Members: ");
-              for (Member member : Member.memberList) {
+              List<Member> members = getAllMembers(); // Fetch members from the database
+              for (Member member : members) {
                   System.out.println(member);
               }
-
               Member selectedMember = selectMember(scanner);
               String memName = null;
               int memID = 0;
-
               if (selectedMember != null) {
                   System.out.println("You selected: " + selectedMember);
                   memName = selectedMember.getName();
@@ -283,15 +391,10 @@ public class Loan {
 
 
               Loan newLoan = new Loan(ranval, bookID, bookName, memID, memName);
-              loanList.add(newLoan);
 
+              insertLoanIntoDatabase(newLoan);
 
-              for (Book book: Book.bookList) {
-                  if (book.getBookID() == bookID) {
-                      book.setOnLoan(true);
-                      book.setOnLoanTo(memName);
-                  }
-              }
+              updateBook(bookID, memName);
 
               System.out.println();
               System.out.println("New Loan added: " + newLoan);

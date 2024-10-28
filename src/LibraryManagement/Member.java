@@ -1,4 +1,6 @@
-import java.util.ArrayList;
+package LibraryManagement;
+
+
 import java.util.Random;
 import java.util.Scanner;
 import java.sql.Connection;
@@ -11,7 +13,6 @@ public class Member {
     private int membershipID;
     private String membershipType;
 
-    static ArrayList<Member> memberList = new ArrayList<>();
 
     // Constructor
     public Member(String name, int membershipID, String membershipType) {
@@ -52,29 +53,40 @@ public class Member {
     public static int generateMemberID() {
         Random memID = new Random();
         int membID;
-
         while (true) {
             membID = memID.nextInt(101);
             boolean exists = false;
-
-            for (Member member : Member.memberList) {
-                if (member.getMembershipID() == membID) {
-                    exists = true;
-                    break;
+            if (!exists) {
+                try {
+                    Connection connection = DatabaseConnection.getConnection();
+                    String query = "SELECT 1 FROM Member WHERE membershipID = ?";
+                    PreparedStatement preparedStatement = connection.prepareStatement(query);
+                    preparedStatement.setInt(1, membID);
+                    ResultSet resultSet = preparedStatement.executeQuery();
+                    if (resultSet.next()) {
+                        exists = true;
+                    }
+                    resultSet.close();
+                    preparedStatement.close();
+                    connection.close();
+                } catch (ClassNotFoundException | SQLException e) {
+                    e.printStackTrace();
                 }
             }
+
             if (!exists) {
                 break;
             }
         }
-        return membID;// Generates a random number between 0 and 100
+        return membID;
     }
 
     public static String selectMembershipType(Scanner scanner) {
         int choice = 0;
         String memType = null;
         do {
-            System.out.println();            System.out.println("Please select your membership type:");
+            System.out.println();
+            System.out.println("Please select your membership type:");
             System.out.println("1. Child");
             System.out.println("2. Student");
             System.out.println("3. Adult");
@@ -106,7 +118,7 @@ public class Member {
 
     private static void insertMemberIntoDatabase(Member member) {
         try {
-            // Get a connection from the DatabaseConnection class
+            // Get a connection from the LibraryManagement.DatabaseConnection class
             Connection connection = DatabaseConnection.getConnection();
 
             // Create the SQL insert statement
@@ -155,7 +167,7 @@ public class Member {
 
     public static void fetchAndPrintAllMembers() {
         try {
-            // Get a connection from the DatabaseConnection class
+            // Get a connection from the LibraryManagement.DatabaseConnection class
             Connection connection = DatabaseConnection.getConnection();
 
             // Create the SQL select statement
