@@ -10,10 +10,6 @@ import java.sql.ResultSet;
 import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-
-
-
-
 public class Loan {
     private int loanID;
     private String bookTitle;
@@ -134,7 +130,6 @@ public class Loan {
         }
     }
 
-
     public static int generateLoanID() {
         Random loanID = new Random();
         int newloanID;
@@ -166,7 +161,6 @@ public class Loan {
         return newloanID; // Generates a random number between 0 and 100
     }
 
-
     public static Book getBookById(int bookID) throws Exception {
         String query = "SELECT * FROM Book WHERE bookID = " + bookID;
         try (Connection con = DatabaseConnection.getConnection();
@@ -187,14 +181,12 @@ public class Loan {
     }
 
     public static Book selectedBook(Scanner scanner) throws Exception {
-
         System.out.println();
         System.out.println("Please select a book by typing in the BookID:");
         int choice = scanner.nextInt();
         scanner.nextLine(); // Consume newline
         Book selectedBook = getBookById(choice);
         return selectedBook;
-
     }
 
     public static Member getMemberById(int memberID) throws Exception {

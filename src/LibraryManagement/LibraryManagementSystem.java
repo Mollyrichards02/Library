@@ -61,6 +61,7 @@ public class LibraryManagementSystem {
                     break;
                 case 4:
                     Librarian.createLibrarian();
+                    break;
                 case 5:
                     Book.fetchAndPrintAllBooks();
                     break;
@@ -71,7 +72,7 @@ public class LibraryManagementSystem {
                     Loan.fetchAndPrintAllLoans();
                     break;
                 case 8:
-                    Librarian.viewAllLibrarians();
+                    Librarian.fetchAndPrintAllLibrarians();
                     break;
                 case 9:
                     System.out.println("Exiting...");
