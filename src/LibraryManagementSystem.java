@@ -14,7 +14,7 @@ public class LibraryManagementSystem {
         System.out.println("9. Exit");
         System.out.print("Enter your choice: ");
     }
-    public static void menu() {
+    public static void menu() throws Exception {
         Scanner scanner = new Scanner(System.in);
         String name;
 

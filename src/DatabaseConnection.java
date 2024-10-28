@@ -1,6 +1,5 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+
 public class DatabaseConnection {
     private static final String URL = "jdbc:mysql://localhost:3306/library";
     private static final String USER = "root";
@@ -11,5 +10,17 @@ public class DatabaseConnection {
         Class.forName("com.mysql.cj.jdbc.Driver");
         // Establish a connection and return it
         return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+
+    public static int getCount(String tableName) throws Exception {
+        String query = "SELECT COUNT(*) FROM " + tableName;
+        try (Connection con = getConnection();
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
     }
 }
